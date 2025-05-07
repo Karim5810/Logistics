@@ -1,0 +1,55 @@
+/* Center the logo and form vertically and horizontally */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center vertically */
+  align-items: center; /* Center horizontally */
+  height: 100vh; /* Full viewport height */
+}
+
+.login-logo img {
+  display: block;
+  margin: 0 auto;
+}
+
+.login-form {
+  margin-top: 20px; /* Add spacing between the logo and the form */
+  text-align: center;
+}
+/* تنسيق خانة البريد الإلكتروني */
+.stTextInput > div > input {
+  border: 1px solid #004d99;
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px;
+  font-size: 16px;
+  color: #004d99;
+  width: 100%; /* Ensure it fits within the limited width */
+}
+
+.stButton {
+  width: 300px;
+  text-align: center;
+}
+.stButton > button {
+  width: 100%; /* Make button fill the container */
+  background: #004d99;
+  color: white;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* تأثير عند التمرير على زر تسجيل الدخول */
+.stButton > button:hover {
+  background: #0066cc;
+  transform: translateY(-2px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
+}
+.stMarkdown {
+  text-align: center;
+  color: #0066cc;
+  margin-top: 10px;
+}

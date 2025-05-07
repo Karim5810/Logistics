@@ -1,0 +1,31 @@
+{
+  "dashboard_layout": null,
+  "dashboard_column_mapping": {
+    "approve_hours": "Month",
+    "logistics_48hrs": "",
+    "logistics_24hrs": "",
+    "cartona_48hrs": "",
+    "cartona_24hrs": "",
+    "avg_days_deliver": "",
+    "avg_days_pending": "",
+    "chart_settings": {
+      "supplier_gmv_share": {
+        "title": "Supplier GMV Share",
+        "data_column": "supplier_name",
+        "chart_type": "pie"
+      },
+      "task_count_runsheet": {
+        "title": "Task Count by Runsheet",
+        "data_column": "supplier_name",
+        "chart_type": "bar"
+      }
+    },
+    "card_titles": {
+      "avg_hours_approve": "Average Hours to Approve Order",
+      "avg_days_deliver": "Average Days to Deliver",
+      "avg_days_pending": "Average Days Pending",
+      "fast_delivery_logistics": "Fast Delivery Rate - Logistics",
+      "fast_delivery_cartona": "Fast Delivery Rate - Cartona"
+    }
+  }
+}

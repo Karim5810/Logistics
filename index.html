@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartona Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { direction: rtl; }
+    .login-page, .dashboard { display: none; }
+    .login-page.active, .dashboard.active { display: block; }
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    .stat-card {
+      transition: transform 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div id="loginPage" class="login-page active">
+    <div class="login-container">
+      <div class="text-center mb-4">
+        <img src="https://via.placeholder.com/150x50?text=Cartona" alt="Cartona Logo" class="mb-3">
+        <h2 class="card-title text-center mb-4">تسجيل الدخول</h2>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">البريد الإلكتروني</label>
+        <input type="email" id="email" class="form-control" placeholder="name@cartona.com">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" id="password" class="form-control" placeholder="كلمة المرور">
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-primary w-100" onclick="login()">تسجيل الدخول</button>
+      </div>
+      <div id="error" class="alert alert-danger mt-3" style="display: none;">
+        خطأ في تسجيل الدخول
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard">
+    <div class="page">
+      <!-- Navbar -->
+      <header class="navbar navbar-expand-md navbar-light d-print-none">
+        <div class="container-xl">
+          <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+            <img src="https://via.placeholder.com/150x50?text=Cartona" alt="Cartona" class="navbar-brand-image">
+          </h1>
+        </div>
+      </header>
+      
+      <div class="page-wrapper">
+        <div class="container-xl">
+          <!-- Page title -->
+          <div class="page-header d-print-none">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2 class="page-title">لوحة التحكم</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="page-body">
+          <div class="container-xl">
+            <!-- Stats Row -->
+            <div class="row row-deck row-cards mb-4" id="cardsContainer">
+              <!-- Cards will be generated here -->
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row row-cards">
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">تحليل الأداء</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="chart-container">
+                      <canvas id="performanceChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">توزيع الطلبات</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="chart-container">
+                      <canvas id="ordersChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+    </div>
+
+            <!-- Suppliers Table -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">بيانات الموردين</h3>
+                    <div class="ms-auto">
+                      <select id="supplierFilter" class="form-select" onchange="updateTable()">
+        <option value="">اختر مورد</option>
+      </select>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table id="supplierTable" class="table table-vcenter card-table">
+        <thead>
+          <tr>
+            <th>اسم المورد</th>
+            <th>الوزن</th>
+            <th>الحجم</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+  <script>
+    // Sample data
+    const suppliersData = [
+      { supplier_name: "مورد 1", weight: 150, volume: 2.5 },
+      { supplier_name: "مورد 2", weight: 200, volume: 3.0 },
+      { supplier_name: "بيبي نو", weight: 175, volume: 2.8 }
+    ];
+
+    const cardsData = [
+      { 
+        title: "متوسط ساعات التأكيد",
+        value: "12",
+        prev: "10",
+        icon: "clock",
+        color: "blue"
+      },
+      {
+        title: "التوصيل السريع 48 ساعة",
+        value: "85%",
+        prev: "80%",
+        icon: "truck-delivery",
+        color: "green"
+      },
+      {
+        title: "حساب الوزن",
+        value: "1.74",
+        prev: "1.65",
+        icon: "weight",
+        color: "purple"
+      }
+    ];
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      if (email.endsWith('@cartona.com') && password.length > 0) {
+        document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('dashboard').classList.add('active');
+        loadDashboard();
+        initializeCharts();
+      } else {
+        document.getElementById('error').style.display = 'block';
+      }
+    }
+
+    function loadDashboard() {
+      // Load cards
+      const cardsContainer = document.getElementById('cardsContainer');
+      cardsContainer.innerHTML = cardsData.map(card => `
+        <div class="col-sm-6 col-lg-4">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="subheader">${card.title}</div>
+                <div class="ms-auto lh-1">
+                  <div class="text-muted">
+                    <i class="ti ti-trending-up text-success"></i>
+                    ${card.prev}
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-baseline mt-4">
+                <div class="h1 mb-0 me-2">${card.value}</div>
+                <div class="me-auto">
+                  <span class="text-${card.color}">
+                    <i class="ti ti-${card.icon}"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Load supplier filter
+      const supplierFilter = document.getElementById('supplierFilter');
+      const uniqueSuppliers = [...new Set(suppliersData.map(s => s.supplier_name))];
+      uniqueSuppliers.forEach(supplier => {
+        const option = document.createElement('option');
+        option.value = supplier;
+        option.textContent = supplier;
+        supplierFilter.appendChild(option);
+      });
+    }
+
+    function initializeCharts() {
+      // Performance Chart
+      new Chart(document.getElementById('performanceChart'), {
+        type: 'line',
+        data: {
+          labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+          datasets: [{
+            label: 'معدل الأداء',
+            data: [65, 59, 80, 81, 56, 55],
+            borderColor: '#206bc4',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      // Orders Chart
+      new Chart(document.getElementById('ordersChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['قيد التنفيذ', 'مكتمل', 'ملغي'],
+          datasets: [{
+            data: [300, 500, 100],
+            backgroundColor: ['#206bc4', '#2fb344', '#d63939']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
+
+    function updateTable() {
+      const selectedSupplier = document.getElementById('supplierFilter').value;
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = '';
+      
+      if (selectedSupplier) {
+        const filteredData = suppliersData.filter(s => s.supplier_name === selectedSupplier);
+        filteredData.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.supplier_name}</td>
+            <td>${row.weight}</td>
+            <td>${row.volume}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
